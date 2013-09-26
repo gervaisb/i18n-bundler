@@ -1,0 +1,173 @@
+@(project: models.Project)
+@import tags._
+@main(project.getKey().toString()) {
+
+<h2>@project.getKey()</h2>
+
+<div class="row-fluid">
+	<fieldset class="span9">
+		<div class="tabbable bundles">
+			<ul class="nav nav-tabs">
+				@for(bundle <- project.bundles){
+					<li><a href="#@bundle.name" data-toggle="tab">@bundle.name</a></li>
+				}
+				<li><a href="/@project.getKey()/bundles/new" title="Add a bundle" data-remote="true"><i class='icon-plus'></i></a></li>
+			</ul>
+			<div class="tab-content">
+			@if(project.bundles.isEmpty()){
+				<div class="alert alert-info">
+					<h4>No bundle</h4>
+					<p>This project does not contains any bundle. Use the "+" tab 
+					or "New" link above to create one.</p>
+				</div>
+			}else{
+				@for(bundle <- project.bundles){
+					<div class="tab-pane bundle" id="@bundle.name">
+						@views.html.bundles._content(bundle)
+					</div>
+				}
+			}
+			</div>
+		</div>
+	</fieldset>
+	<div class="span3">
+    	<fieldset>
+        	<legend>Add translation</legend>
+        	<form id="form-new-translation" class="" method="PUT" action="/api/v1/@project/bundles/${bundle}/${key}">
+        		<div class="alert alert-error hide"></div>
+	            <div class="control-group">
+	                <div class="input-append">
+			  		    <input class="input-xlarge" type="text" placeholder="Key" name="key" id="key" />
+			 		    <span class="btn add-on disabled"><i class="icon-search">&nbsp;</i></span>
+				    </div>
+	            </div>
+
+	            <div class="control-group">
+	                <div class="controls">
+	                    <input class="input-xlarge ui-fr" type="text" id="fr" name="fr" placeholder="French" />
+	                </div>
+	            </div>
+
+	            <div class="control-group">
+	                <div class="controls">
+	                    <input class="input-xlarge ui-nl" type="text" id="nl" name="nl" placeholder="Dutch" />
+	                </div>
+	            </div>
+
+	            <div class="control-group">
+	                <div class="controls">
+						<label class="checkbox">
+	                		<input type="checkbox" checked="checked" name="translate" id="translate" value="true" />
+	                		<span class="help-inline">Translate the missing values</span>  
+	                	</label>
+	                </div>
+	            </div>
+	            
+	            <div class="form-actions">
+                    <button type="submit" class="btn" disabled="disabled"><i class="icon-plus"></i>&nbsp;Add</button>
+	            </div>
+        	</form>
+        	
+        	<ol id="pending-translations" class="unstyled"></ol>
+	    </fieldset>
+  </div>
+</div>
+} {
+	/** Handle the creation of a new translation */
+	$form = $('#form-new-translation').submit(function(e){
+		var $form = $(this),
+			_bundle = $('.tabbable .nav-tabs .active a').attr('href').substring(1),
+			_key = $form.find('#key').val(),
+			_action = $form.attr('action')
+				.replace('${bundle}', _bundle)
+				.replace('${key}', _key)
+				+'?translate='+$form.find('#translate').val(),
+			_data = '{"key":"'+_key+'","values":{'+
+				'"fr" : "'+$form.find('#fr').val()+'",'+
+				'"nl" : "'+$form.find('#nl').val()+'"}}';
+			_valid = validate($form.find('#key'), notEmpty);
+
+		if ( _valid ) {
+			$form.find('.alert').empty().hide();
+			$('#pending-translations')
+				.append('<li class="'+_key+'"><img src="@routes.Assets.at("images/loader.gif")" alt="..."/> <code>'+_key+'</code></li>');
+			
+			$.ajax(_action, {type: $form.attr('method'), data: _data, contentType: 'application/json', dataType: 'json'})
+				.done(function(project, status, request){
+					$('#'+_bundle).load('/@project/'+_bundle, function(){
+						$newcontent = $('#'+_bundle); 
+						bind($newcontent);
+						$newcontent.find('a[data-remote="true"]').click(function(){
+							$.get($(this).attr('href'));
+							return false;
+						});
+						
+						$('#'+escape(_bundle+'\\'+_key)).effect('highlight', 4500);
+						
+						$('#pending-translations .'+escape(_key)).remove();
+					});
+				})
+				.fail(function(request){
+					$('#pending-translations .'+escape(_key))
+						.append('<span class="label">&nbsp;'+request.statusText+'</span>').end()
+						.find('img').replaceWith('<span class="badge badge-important">!</span>')						
+						.fadeOut(10000);	
+				});
+				
+			$form[0].reset();
+		}
+		e.preventDefault();
+	});
+
+	if ( $('.tabbable .nav-tabs a').length>1 ) {
+		$form.find('.disabled').removeClass('disabled').end()
+			 .find(':disabled').removeAttr('disabled');
+	}
+	
+	function bind($bundle) {
+		$bundle.find('a.to-del').click(function(){
+			var $link = $(this),
+				$row  = $link.closest('tr'),
+				_href = $link.attr('href');
+			$.ajax(_href, {type: 'DELETE'})
+				.done(function(project, status, request){
+					var _values = $row.attr('id').split('\\'),
+						_href = '/@project/'+_values[0];
+					$.get(_href, function(content){
+						$row.effect('hide', function(){
+							$bundle.empty().append(content);
+							
+							$bundle.find('a[data-remote="true"]').click(function(){
+								$.get($(this).attr('href'));
+								return false;
+							});
+							bind($bundle);
+						});	
+					});
+					
+				})
+				.fail(function(request){
+					var _values = $row.attr('id').split('\\');
+					$('<div id="project-form-dialog" class="modal">'+
+					  ' <div class="modal-body alert alert-error">'+
+					  '      <h4>Failure</h4>'+
+					  '      <p>Failed to remove "'+_values[1]+'" from "'+_values[0]+'"</p>'+
+					  '      <p><strong>'+request.status+'</strong> '+request.statusText+'.</p>'+
+					  ' </div>'+
+					  ' <div class="modal-footer">'+
+	    			  '   <a href="#" class="btn" data-dismiss="modal">Ok</a>'+
+					  ' </div>'+
+					  '</div>').modal('show');
+				
+				});
+			
+			return false;
+		});
+	}
+	
+	$('.bundle').each(function(){
+		bind($(this));
+	});
+} {
+	<a href="/@project.getKey()/bundles/new" title="Add a bundle" data-remote="true">New</a>
+}

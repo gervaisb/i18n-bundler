@@ -1,0 +1,60 @@
+@(model: Form[models.Bundle], project: models.Project.Key)
+@import helper._
+@implicitField = @{ FieldConstructor(_formconstructor.f) }
+
+var _body = 
+'<div id="bundle-form-dialog" class="modal">'+
+'	<div class="modal-header">'+
+'	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+'	    <h3>New bundle</h3>'+
+'	</div>'+
+'	<div class="modal-body">'+
+'		<form method="PUT" class="form-horizontal">'+
+'	        <p class="alert alert-error hide"></p>'+
+' '+
+'			<div class="control-group">'+
+'				<label class="control-label" for="name">Name</label>'+
+'				<div class="controls">'+
+'					<input type="text" id="name" name="name" value="" />'+
+'					<span class="help-inline">constraint.pattern, Required</span>'+
+'				</div>'+
+'			</div>'+              
+'		</form>'+
+'	</div>'+
+'	<div class="modal-footer">'+
+'	    <a href="#" class="btn btn-cancel" data-dismiss="modal">Close</a>'+
+'	    <input type="submit" value="Create" class="btn btn-primary" />'+
+'	</div>'+
+'</div>';
+
+$(_body).modal('show').find('.modal-body form').submit(function(e){
+		var $form = $(this);
+			_name = $form.find('#name').val();
+			_valid = validate($form.find('#name'), notEmpty);
+		
+		if ( _valid ) {
+			$.ajax('/api/v1/@project/bundles/'+_name, {type: $form.attr('method')})
+				.done(function(bundle, status, request){
+					var target = window.location.href
+						index = -1;
+					if ( (index = target.indexOf('#'))>-1 ) {
+						target = target.substring(0, index+1)+bundle.name;
+					} else {
+						target = target+'#'+bundle.name;
+					}
+					window.location.replace(target);
+					window.location.reload();
+				})
+				.fail(function(request){
+					$('#bundle-form-dialog .alert')
+						.append('<p><strong>'+request.status+'</strong> '+request.statusText+'.</p>')
+						.show();
+				});
+		}
+		e.preventDefault();
+	}).end().find('.modal-header .close, .modal-footer .btn-cancel').click(function(){
+		$('#bundle-form-dialog').modal('hide').remove();
+		return false;
+	}).end().find('.modal-footer :submit').click(function(){		
+		$('#bundle-form-dialog .modal-body form').submit();
+	});

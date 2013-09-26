@@ -1,0 +1,25 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /														controllers.ui.Application.home()
+GET     /projects/new											controllers.ui.Application.showNewProjectDialog()
+GET     /$ga<([a-z0-9-_]\.?)+:([a-z0-9-_]\.?)+>					controllers.ui.Application.editProject(ga: models.Project.Key)
+GET     /$ga<([a-z0-9-_]\.?)+:([a-z0-9-_]\.?)+>/bundles/new		controllers.ui.Application.showNewBundleDialog(ga: models.Project.Key)
+GET     /$ga<([a-z0-9-_]\.?)+:([a-z0-9-_]\.?)+>/:bundle			controllers.ui.Application.showBundlePartial(ga: models.Project.Key, bundle: String)
+GET     /$ga<([a-z0-9-_]\.?)+:([a-z0-9-_]\.?)+>/:bundle/:key	controllers.ui.Application.showUpdateTranslationDialog(ga: models.Project.Key, bundle: String, key: String)
+
+GET     /api/v1/                           				controllers.api.v1.Projects.index()
+GET		/api/v1/$ga<([a-z0-9-_]\.?)+:([a-z0-9-_]\.?)+>	controllers.api.v1.Projects.show(ga: models.Project.Key)		
+PUT     /api/v1/$ga<([a-z0-9-_]\.?)+:([a-z0-9-_]\.?)+> 	controllers.api.v1.Projects.create(ga: models.Project.Key)
+
+GET		/api/v1/$project<([a-z0-9-_]\.?)+:([a-z0-9-_]\.?)+>/bundles/		controllers.api.v1.Bundles.index(project:  models.Project.Key)		
+GET		/api/v1/$project<([a-z0-9-_]\.?)+:([a-z0-9-_]\.?)+>/bundles/:bundle	controllers.api.v1.Bundles.show(project:  models.Project.Key, bundle: String)		
+PUT		/api/v1/$project<([a-z0-9-_]\.?)+:([a-z0-9-_]\.?)+>/bundles/:bundle	controllers.api.v1.Bundles.create(project:  models.Project.Key, bundle: String)		
+
+PUT		/api/v1/$project<([a-z0-9-_]\.?)+:([a-z0-9-_]\.?)+>/bundles/:bundle/:key	controllers.api.v1.Translations.put(project: models.Project.Key, bundle: String, key: String, translate: Boolean ?= false)
+DELETE	/api/v1/$project<([a-z0-9-_]\.?)+:([a-z0-9-_]\.?)+>/bundles/:bundle/:key	controllers.api.v1.Translations.delete(project: models.Project.Key, bundle: String, key: String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)

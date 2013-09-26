@@ -1,0 +1,3 @@
+@(text: String, href: String = "#", remote: Boolean = false)
+
+<a href="@href" @if(remote){data-remote="true"}>@text</a>

@@ -1,0 +1,31 @@
+@(projects: List[models.Project])
+@import tags._
+@main("Projects") {
+    <h1>i18n Bundler</h1>
+
+	@if(projects.isEmpty()) {	
+		<div class="alert alert-info">
+			<h4>No project</h4>
+			<p>You don't have any project. A project contains translations 
+			inside a set of bundles.</p>
+			<p>Use the "New" link above to create a project.</p> 
+		</div>
+	} else {
+		<ul class="thumbnails">
+		@for(project <- projects) { 
+		    <li class="span6">
+		    	<div class="thumbnail">
+		    		<h3>@project.getGroupId():@project.getArtifactId()</h3> 
+					<p>
+						<a href="/@project.getKey()" class="to-edit">Edit &raquo;</a>
+					</p>
+				</div>        
+		    </li>
+		}
+		</ul>
+	}
+} {
+   @* No scripts for this page *@	
+} {
+	@link("New", "/projects/new", remote=true)
+}

@@ -1,0 +1,15 @@
+@(element: helper.FieldElements)
+@import tags._
+<div class="control-group @if(element.hasErrors){error}">
+	<label class="control-label" for="@element.id">@capitalize(element.label)</label>
+	<div class="controls">
+		@element.input
+		<span class="help-inline">
+		@if(element.hasErrors) {
+			@element.errors(element.lang).mkString(", ").
+		}else{
+			@element.infos.mkString(", ")
+		}
+		</span>
+	</div>
+</div>

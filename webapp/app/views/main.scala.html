@@ -1,0 +1,65 @@
+@(title: String)(content: Html)(scripts: Html)(action: Html)
+@import tags._
+<!DOCTYPE html>
+
+<html>
+    <head>
+ 
+    <meta charset="utf-8">
+    <title>@title | i18n Bundler</title>
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link type="text/css" rel="stylesheet" href="@routes.Assets.at("stylesheets/bootstrap.min.css")">
+    <link type="text/css" rel="stylesheet" href="@routes.Assets.at("stylesheets/bootstrap-responsive.min.css")">
+    <link type="text/css" rel="stylesheet" href="@routes.Assets.at("stylesheets/application.css")">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript" language="javascript" src="@routes.Assets.at("javascripts/jquery-1.10.2.js")"></script>
+    <script type="text/javascript" language="javascript" src="@routes.Assets.at("javascripts/jquery-ui-1.9.2.js")"></script>
+    <script type="text/javascript" language="javascript" src="@routes.Assets.at("javascripts/bootstrap.min.js")"></script>
+    <script type="text/javascript" language="javascript" src="@routes.Assets.at("javascripts/application.js")"></script>
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a id="to-home" class="brand" href="/">i18n Bundler</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li>@action</li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div id="content">
+        <div class="container" id="page-view">
+            @content
+        </div>
+    </div>
+    <div id="placeholder" style="position: absolute"></div>
+    
+    <script type="text/javascript"><!--
+    @scripts
+   	--></script>
+  </body>
+</html>
+

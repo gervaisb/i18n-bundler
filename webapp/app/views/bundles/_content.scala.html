@@ -1,0 +1,79 @@
+@(bundle: models.Bundle)
+
+@if(bundle.isEmpty()) {
+	<div class="alert alert-info">
+		<h4>Empty bundle</h4>
+		<p>This bundle has no translation.</p>
+		<p>Use the forms on the right to add a new translation.</p>
+	</div>
+} else {
+	<table class="table table-condensed table-striped table-hover">
+		<!-- <thead>
+			<tr>
+				<td colspan="3">
+					<div class="controls">
+						<div class="input-append">
+							<input class="span6" type="text" /> <span class="btn add-on"
+								title="Apply filter"><i class="icon-filter">&nbsp;</i></span> <span
+								class="btn add-on" title="Reset filter">Reset</span>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</thead> -->
+		<tbody>
+			@for(translation <- bundle.getTranslations()) {
+			<tr id="@{bundle.name}\@{translation.key}">
+				<td width="20px">
+					<a href="/api/v1/@bundle.project/bundles/@bundle.name/@translation.key" class="to-del hide" title="Remove"><i class="icon-remove">&nbsp;</i></a>
+					<a href="/@bundle.project/@bundle.name/@translation.key" class="hide" title="Edit" data-remote="true"><i class="icon-pencil">&nbsp;</i></a>
+				</td>
+				<td class="view">
+					<code>@translation.key</code><br />
+					@if(translation.hasFrench()){
+						<p lang="fr" class="ui-fr">@translation.toFrench()</p>
+					}
+					@if(translation.hasDutch()){
+						<p lang="nl" class="ui-nl">@translation.toDutch()</p>
+					}
+					@if(!translation.hasFrench() && !translation.hasDutch()){ 
+						<p>
+							<span class="label label-important">Not translated</span> 
+						</p>
+					}
+				</td>
+			</tr>
+			}
+		</tbody>
+		@*<tfoot>
+			<tr>
+				<td colspan="2">
+					<div class="pagination">
+						<ul>
+						    <li class="@if( page.isFirst() ){disabled}"><a href="#?">Prev</a></li>
+						    @for(index <- 1 to page.getAvailables()){
+						    <li class="@if( page.getIndex()==index){active}">
+						      <a href="?p=@index">@index</a>
+						    </li>
+						    }
+						    <li class="@if( page.isLast() ){disabled}"><a href="#">Next</a></li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+		</tfoot>*@
+	</table>
+}
+	<div class="btn-toolbar">
+		<div class="btn-group">
+			<a class="btn dropdown-toggle @if(bundle.isEmpty()){disabled}" data-toggle="dropdown" href="#"> 
+				<i class="icon-download-alt">&nbsp;</i>Export <span class="caret"></span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a href="/api/v1/@bundle.project/bundles/@{bundle.name}_fr.properties">.properties French</a></li>
+				<li><a href="/api/v1/@bundle.project/bundles/@{bundle.name}_nl.properties">.properties Dutch</a></li>
+				<li><a href="/api/v1/@bundle.project/bundles/@{bundle.name}.xls">.xls</a></li>
+			</ul>
+		</div>
+		<!-- <button class="btn"><i class="icon-eye-open">&nbsp;</i> Request review</button> -->
+	</div>

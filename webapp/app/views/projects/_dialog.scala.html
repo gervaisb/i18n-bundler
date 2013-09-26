@@ -1,0 +1,69 @@
+@(model: Form[models.Project])
+@import helper._
+@implicitField = @{ FieldConstructor(_formconstructor.f) }
+
+var _body = '<div id="project-form-dialog" class="modal">'+
+'	<div class="modal-header">'+
+'	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+'	    <h3>New project</h3>'+
+'	</div>'+
+'	<div class="modal-body">'+
+'		@*<form method="PUT" class="form-horizontal">'+
+'	        <p class="alert alert-error hide"></p>'+
+'			@inputText(model("groupId"), 'infos -> "Required")'+                
+'			@inputText(model("artifactId"))                '+
+'		</form>*@'+
+'		<form method="PUT" class="form-horizontal">'+
+'	        <p class="alert alert-error hide"></p>'+
+'			'+
+'			<div class="control-group ">'+
+'				<label class="control-label" for="groupId">GroupId</label>'+
+'				<div class="controls">'+
+'				    <input type="text" id="groupId" name="groupId" value="" infos="Required">'+
+'					<span class="help-inline"></span>'+
+'				</div>'+
+'			</div>'+
+''+
+'			<div class="control-group ">'+
+'				<label class="control-label" for="artifactId">ArtifactId</label>'+
+'				<div class="controls">'+
+'				    <input type="text" id="artifactId" name="artifactId" value="">'+
+'					<span class="help-inline"></span>'+
+'				</div>'+
+'			</div>'+
+'		</form>'+
+'	</div>'+
+'	<div class="modal-footer">'+
+'	    <a href="#" class="btn btn-cancel" data-dismiss="modal">Close</a>'+
+'	    <input type="submit" value="Create" class="btn btn-primary" />'+
+'	</div>'+
+'</div>';
+
+$(_body).modal('show').find('.modal-body form').submit(function(e){
+		var $form = $(this);
+			_groupId = $form.find('#groupId').val();
+			_artifactId = $form.find('#artifactId').val();
+			_valid = true;			
+
+		_valid = validate($form.find('#groupId'), notEmpty) &&
+				 validate($form.find('#artifactId'), notEmpty);
+		
+		if ( _valid ) {
+			
+			$.ajax('/api/v1/'+_groupId+':'+_artifactId, {type: $form.attr('method')})
+				.done(function(project, status, request){
+					window.location.replace('/'+project.groupId+':'+project.artifactId);
+				})
+				.fail(function(request){
+					$('#project-form-dialog .alert')
+						.append('<p><strong>'+request.status+'</strong> '+request.statusText+'.</p>')
+						.show();
+				});
+		}
+		e.preventDefault();
+	}).end().find('.modal-header .close, .modal-footer .btn-cancel').click(function(){
+		$('#project-form-dialog').modal('hide').remove();
+		return false;
+	}).end().find('.modal-footer :submit').click(function(){		
+		$('#project-form-dialog .modal-body form').submit();
+	});

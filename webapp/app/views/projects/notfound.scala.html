@@ -1,0 +1,16 @@
+@(key: models.Project.Key)
+@import tags._
+@main("Projects") {
+    <h1>i18n Bundler</h1>
+
+	
+	<div class="bundle-missing alert alert-error">
+		<h4>Project @key not found</h4>
+		<p>The project @key is not found. Verify your url or use the the "New"
+		link above to create it.</p>
+	</div>
+} {
+   @* No scripts for this page *@
+} {
+	@link("New", "/projects/new", remote=true)
+}

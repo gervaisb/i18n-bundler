@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Manual | i18n Bundler</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<!-- Le styles -->
+<link href="../stylesheets/bootstrap.min.css" rel="stylesheet">
+<style type="text/css">
+body {
+	padding-top: 60px;
+	padding-bottom: 40px;
+}
+
+.sidebar-nav {
+	padding: 9px 0;
+	position: fixed;
+	top: 80px;
+}
+</style>
+<link href="../stylesheets/bootstrap-responsive.min.css"
+	rel="stylesheet">
+
+<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container-fluid">
+				<a class="btn btn-navbar" data-toggle="collapse"
+					data-target=".nav-collapse"> <span class="icon-bar"></span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span>
+				</a> <a class="brand" href="#">i18n Bundler</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span3">
+				<div class="well sidebar-nav">
+					<ul class="nav nav-list">
+						<li class="nav-header">About</li>
+						<li><a href="#about">What does this app ?</a></li>
+
+						<li class="nav-header">Usage</li>
+						<li><a href="#usage">How to use it ?</a></li>
+						<li><a href="#project">Project</a></li>
+						<li><a href="#bundle">Bundle</a></li>
+						<li class="nav-header">Translation</li>
+						<li><a href="#translation">Translation</a></li>
+						<li><a href="#add-translation">Add</a></li>
+						<li><a href="#edit-translation">Edit</a></li>
+						<li><a href="#remove-translation">Remove</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="span9">
+			
+				<h1 id="about">What does this app ?</h1>
+				<p>The goal is to help managing messages bundle. This app provide a simple frontend who allow users 
+				to manage a set of translated messages and expose is backend trough a RESTfull API.</p>
+				<hr />
+				
+				<h1 id="usage">How to use it ?</h1>
+				<p>This application is built around 3 concepts :</p> 
+					<dl class="dl-horizontal">
+						<dt>Translation</dt>
+						<dd>A translation is a set of messages in different languages. Thoses messages are identified 
+						a key.</dd>
+						
+						<dt>Bundle</dt>
+						<dd>A bundle is a set of <strong>Translation</strong>s. It allow users to regroup the 
+						translations. (eg: messages, errors)</dd>
+						
+						<dt>Project</dt>
+						<dd>The project is the base unit, it contains one or more <strong>Bundle</strong>s.</dd> 
+					</dl>
+				<hr />
+				
+				<h2 id="project">Project</h2>
+				<p>To create a project, open the home page and use the "New" link from the header navigation.</p>
+				<p>A project is identified by a <em>groupId</em> and and <em>artifactId</em>.</p>
+				<hr />
+				
+				<h2 id="bundle">Bundle</h2>
+				<p>When you are viewing a project, you can create a bundle to this project whith the "New" link from 
+				the header navigation or via the "+" tab.</p>
+				<p>A bundle is identified by a <em>name</em> who must be unique inside a project.</p>
+				<hr />
+				
+				<h2 id="translation">Translation</h2>
+				<p>A translation is key and and some pairs of language and message. You can manage translations 
+				inside a bundle and export them a Java .properties or Microsoft Excel sheet.</p>
+				<p><strong>Note :</strong> Actually only French and Dutch are supported as language.</p>
+				
+				<h3 id="add-translation">Add a translation</h3>
+				<p>When you edit a project you have a two columns page. The left column contains all bundles for 
+				the project inside tabs while the left column let you add translation in the selected bundle.</p>
+				<p>The translation is identified by a key who is unique inside the project. She can also contains 
+				values in some languages. If you leaves those values empty, you can let the system translate the key
+				for you.</p>
+				<p>The automatic translation is done on a humanized form of the key who is supposed to be in english.</p>
+				
+				<h3 id="edit-translation">Editing a translation</h3>
+				<p>Place your cursor on the translation row, a cross and a pencil appears on the left. Use the pencil to 
+				open a dialog who let you edit the translation key and values.</p>
+				<p>Since a translation key is unique inside a bundle, you can also edit a translation by creating a new 
+				one with the same key, you then override the existing translation.</p>
+				 
+				
+				<h3 id="remove-translation">Remove a translation</h3>
+				<p>To remove a translation, use the cross who appear on the left when you move your cursor hover the 
+				translation row.</p> 
+			</div>
+		</div>
+		<!--/row-->
+
+	</div>
+	<!--/.fluid-container-->
+
+
+</body>
+</html>

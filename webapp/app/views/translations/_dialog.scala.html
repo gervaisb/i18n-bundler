@@ -1,0 +1,91 @@
+@(translation: models.Translation, bundle: models.Bundle)
+
+var _body = 
+'<div id="translation-form-dialog" class="modal">'+
+'	<div class="modal-header">'+
+'	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+'	    <h3>Updating "<em>@translation.key</em>"</h3>'+
+'	</div>'+
+'	<div class="modal-body">'+
+'		<form method="PUT" class="form-horizontal" action="/api/v1/@bundle.project/bundles/@bundle.name/@translation.key">'+
+'	        <p class="alert alert-error hide"></p>'+
+'			'+
+'			<div class="control-group">'+
+'   			<label class="control-label" for="key">Key</label>'+
+'    			<div class="controls">'+
+'      				<input type="text" name="key" id="key" value="@translation.key" />'+
+'    			</div>'+
+'  			</div>'+
+'			'+
+'			<div class="control-group">'+
+'    			<label class="control-label" for="fr">French</label>'+
+'    			<div class="controls">'+
+'      				<input type="text" name="fr" id="fr" class="ui-fr" value="@translation.toFrench()" />'+
+'    			</div>'+
+'  			</div>'+
+'			'+
+'			<div class="control-group">'+
+'    			<label class="control-label" for="nl">Dutch</label>'+
+'    			<div class="controls">'+
+'      				<input type="text" name="nl" id="nl" class="ui-nl" value="@translation.toDutch()"/>'+
+'    			</div>'+
+'  			</div>'+
+'  			'+
+'  			<div class="control-group">'+
+'            	<label class="control-label" for="translate">Translate</label>'+
+'            	<div class="controls">'+
+'              		<label class="checkbox">'+
+'                		<input type="checkbox" id="translate" name="translate" value="true" />'+
+'                		<span class="help-inline">Translate the missing values</span>'+
+'              		</label>'+
+'            	</div>'+
+'          	</div>'+             
+'		</form>'+
+'	</div>'+
+'	<div class="modal-footer">'+
+'	    <a href="#" class="btn btn-cancel" data-dismiss="modal">Cancel</a>'+
+'	    <input type="submit" value="Save" class="btn btn-primary" />'+
+'	</div>'+
+'</div>';
+
+$(_body).modal('show').find('.modal-body form').submit(function(e){
+		var $form = $(this),
+			_key = $form.find('#key').val(),
+			_data = '{"key":"'+_key+'","values":{'+
+				'"fr" : "'+$form.find('#fr').val()+'",'+
+				'"nl" : "'+$form.find('#nl').val()+'"}}',
+			_translate = $form.find('#translate').val(),
+			_valid = false;
+		_valid = validate($form.find('#key'), notEmpty);
+		if ( _valid ) {
+			$.ajax($form.attr('action')+'?translate='+_translate, {type: $form.attr('method'), data: _data, contentType: 'application/json', dataType: 'json'})
+				.done(function(translation, status, request){
+					var $row     = $('#'+escape('@{bundle.name}\\'+translation.key)), 
+						_content = '';
+					if ( translation.values.fr!=null ) {
+						_content += '<p class="ui-fr" lang="fr">'+translation.values.fr+'</p>';
+					}
+					if ( translation.values.nl!=null ) {
+						_content += '<p class="ui-nl" lang="nl">'+translation.values.nl+'</p>';
+					} else  if ( translation.values.fr==null && translation.values.nl==null ) {
+						_content += '<p><span class="label label-important">Not translated</span></p>';
+					}
+					$row.find('td.view')
+							.find('p').remove().end()
+							.append(_content);
+					$('#translation-form-dialog').modal('hide').remove();
+					$row.effect('highlight', 4500);
+				})
+				.fail(function(request){
+					$('#translation-form-dialog .alert')
+						.append('<p><strong>'+request.status+'</strong> '+request.statusText+'.</p>')
+						.show();
+				});
+		}		
+		e.preventDefault();
+	}).end().find('.modal-header .close, .modal-footer .btn-cancel').click(function(){
+		$('#translation-form-dialog').modal('hide').remove();
+		return false;
+	}).end().find('.modal-footer :submit').click(function(){
+		$('#translation-form-dialog .modal-body form').submit();
+	});
